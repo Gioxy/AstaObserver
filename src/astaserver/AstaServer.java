@@ -77,28 +77,30 @@ class Cliente extends Thread implements Observer {
 
             //memorizzazione ip e nome del client all'interno del array di utenti
             utenti[i] = new Utenti(nome, client.getInetAddress().toString());
-            i++;
+            if(i<n_utenti)
+                i++;
             System.out.println(Arrays.deepToString(utenti));
-            //comunicazione base d'asta ai client
+            //comunicazione base d'asta iniziale ai client
             out.println(ms.getNomeClient()+": "+ms.getBaseAsta());
 
-            //lettura rilancio da parte del client e set del prezzo dell'asta
+            //lettura rilancio da parte del client e set dell'offerta corrente
             while(true)
             {
                 String lettRil = in.readLine();
-                System.out.println("Ricevuto: " + lettRil + " da " + utenti[i - 1].nome);
                 ms.setBaseAsta(Integer.parseInt(lettRil),nome);
+                System.out.println("Ricevuto: " + lettRil + " da " + ms.getNomeClient());//utenti[i - 1].nome);
                 System.out.println("Current asta: " + ms.getBaseAsta());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    //metodo che comunica al client l'fferta migliore corrente 
     @Override
     public void update(Observable o, Object o1) {
         System.out.println("Aggiorno");
         System.out.println("asta: " + ms.getBaseAsta());
+        //uscita dell'inforazione contenente il nome del client che ha effettuato l'offerta migliore
         out.println(String.valueOf(ms.getNomeClient()+": "+ms.getBaseAsta()));
     }
 }

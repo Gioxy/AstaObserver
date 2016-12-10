@@ -27,17 +27,18 @@ public class MonitorServ extends Observable
         return baseAsta;
     }
 
-    public String getNomeClient() 
+    synchronized public String getNomeClient() 
     {
         return nomeClient;
     }
 
-    public void setNomeClient(String nomeClient) 
+    synchronized public void setNomeClient(String nomeClient) 
     {
         this.nomeClient = nomeClient;
     }
 
-    
+    //metodo che verifica se la l'offerta ricevuta è maggiore di quella precedente
+    //se lo è, l'offerta corrente viene aggiornata 
     synchronized public void setBaseAsta(int baseAsta,String nomeCL) 
     {
         if(getBaseAsta()<baseAsta)
