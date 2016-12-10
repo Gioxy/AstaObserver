@@ -81,7 +81,8 @@ class Cliente extends Thread implements Observer {
                 i++;
             System.out.println(Arrays.deepToString(utenti));
             //comunicazione base d'asta iniziale ai client
-            out.println(ms.getNomeClient()+": "+ms.getBaseAsta());
+            out.println(ms.getNomeClient());
+            out.println(ms.getBaseAsta());
 
             //lettura rilancio da parte del client e set dell'offerta corrente
             while(true)
@@ -99,8 +100,8 @@ class Cliente extends Thread implements Observer {
     @Override
     public void update(Observable o, Object o1) {
         System.out.println("Aggiorno");
-        System.out.println("asta: " + ms.getBaseAsta());
         //uscita dell'inforazione contenente il nome del client che ha effettuato l'offerta migliore
-        out.println(String.valueOf(ms.getNomeClient()+": "+ms.getBaseAsta()));
+        out.println(String.valueOf(ms.getNomeClient()));
+        out.println(String.valueOf(ms.getBaseAsta()));
     }
 }
