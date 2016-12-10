@@ -14,10 +14,12 @@ import java.util.Observable;
 public class MonitorServ extends Observable
 {
     private int baseAsta;
+    private String nomeClient;
 
     public MonitorServ(int baseAsta) 
     {
         this.baseAsta = baseAsta;
+        nomeClient="Server";
     }
 
     synchronized public int getBaseAsta() 
@@ -25,11 +27,23 @@ public class MonitorServ extends Observable
         return baseAsta;
     }
 
-    synchronized public void setBaseAsta(int baseAsta) 
+    public String getNomeClient() 
+    {
+        return nomeClient;
+    }
+
+    public void setNomeClient(String nomeClient) 
+    {
+        this.nomeClient = nomeClient;
+    }
+
+    
+    synchronized public void setBaseAsta(int baseAsta,String nomeCL) 
     {
         if(getBaseAsta()<baseAsta)
         {
             this.baseAsta = baseAsta;
+            setNomeClient(nomeCL);
             setChanged();
             notifyObservers();
         }

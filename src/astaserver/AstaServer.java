@@ -54,10 +54,12 @@ class Cliente extends Thread implements Observer {
     BufferedReader in;
     PrintWriter out;
     MonitorServ ms;
+    String nome ;
 
     public Cliente(Socket client, MonitorServ ms) {
         this.client = client;
         this.ms = ms;
+        nome="";
         try{
         in = new BufferedReader(new InputStreamReader(client.getInputStream()));//
         out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
@@ -70,7 +72,7 @@ class Cliente extends Thread implements Observer {
     @Override
     public void run() {
         try {
-            String nome = in.readLine();//stringa che memorizza il nome del client
+            nome = in.readLine();//stringa che memorizza il nome del client
             System.out.println("Si è collegato l'utente con ip " + client.getInetAddress() + " con il nome " + nome);
 
             //memorizzazione ip e nome del client all'interno del array di utenti
@@ -78,14 +80,16 @@ class Cliente extends Thread implements Observer {
             i++;
             System.out.println(Arrays.deepToString(utenti));
             //comunicazione base d'asta ai client
-            String risposta = String.valueOf(baseAsta);
-            out.println(risposta);
+            out.println(ms.getNomeClient()+": "+ms.getBaseAsta());
 
             //lettura rilancio da parte del client e set del prezzo dell'asta
-            String lettRil = in.readLine();
-            System.out.println("Ricevuto: " + lettRil + " da " + utenti[i - 1].nome);
-            ms.setBaseAsta(Integer.parseInt(lettRil));
-            System.out.println("Current asta: " + ms.getBaseAsta());
+            while(true)
+            {
+                String lettRil = in.readLine();
+                System.out.println("Ricevuto: " + lettRil + " da " + utenti[i - 1].nome);
+                ms.setBaseAsta(Integer.parseInt(lettRil),nome);
+                System.out.println("Current asta: " + ms.getBaseAsta());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -95,6 +99,6 @@ class Cliente extends Thread implements Observer {
     public void update(Observable o, Object o1) {
         System.out.println("Aggiorno");
         System.out.println("asta: " + ms.getBaseAsta());
-        out.println(String.valueOf(ms.getBaseAsta()));
+        out.println(String.valueOf(ms.getNomeClient()+": "+ms.getBaseAsta()));
     }
 }
