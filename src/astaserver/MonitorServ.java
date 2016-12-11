@@ -9,7 +9,7 @@ import java.util.Observable;
 
 /**
  *
- * @author Paolo Galletta
+ * @author Gioele Salmaso
  */
 public class MonitorServ extends Observable
 {

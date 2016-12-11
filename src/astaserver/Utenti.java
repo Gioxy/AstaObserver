@@ -7,7 +7,7 @@ package astaserver;
 
 /**
  *
- * @author Paolo Galletta
+ * @author Gioele Salmaso
  */
 public class Utenti 
 {

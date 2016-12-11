@@ -37,7 +37,6 @@ public class AstaServer {
                 Socket client = server.accept();
                 Cliente clt = new Cliente(client, ms);
                 ms.addObserver(clt);
-                System.out.println(ms.countObservers());
                 clt.start();
             }
         } catch (Exception e) {
