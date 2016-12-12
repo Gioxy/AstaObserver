@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Scanner;
+import java.util.Random;
 
 public class AstaServer {
 
@@ -28,8 +29,8 @@ public class AstaServer {
         System.out.println("Quanti utenti possono partecipare all'asta?");
         n_utenti = ut.nextInt();
         utenti = new Utenti[n_utenti];//definisce la grandezza dell'array di utenti
-        System.out.println(Arrays.deepToString(utenti));
-        baseAsta = 100;
+        Random r=new Random();
+        baseAsta =r.nextInt(100);
         ms = new MonitorServ(baseAsta);
         try {
             ServerSocket server = new ServerSocket(Numero_Porta, n_utenti);
