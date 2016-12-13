@@ -100,7 +100,7 @@ class Cliente extends Thread implements Observer {
     @Override
     public void update(Observable o, Object o1) {
         System.out.println("Aggiorno");
-        //uscita dell'inforazione contenente il nome del client che ha effettuato l'offerta migliore
+        //uscita dell'informazione contenente il nome del client che ha effettuato l'offerta migliore
         out.println(String.valueOf(ms.getNomeClient()));
         out.println(String.valueOf(ms.getBaseAsta()));
     }
