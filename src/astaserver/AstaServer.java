@@ -87,6 +87,9 @@ class Cliente extends Thread implements Observer {
             //lettura rilancio da parte del client e set dell'offerta corrente
             while(true)
             {
+                //in entrata c'è sempre un'offerta maggiore di quella corrente
+                //qui verrà ogni volta reinizializzata la variabile che tiene conto del tempo trascorso
+                //la procedura per il tempo dev'essere fatta tuttta qui dentro
                 String lettRil = in.readLine();
                 ms.setBaseAsta(Integer.parseInt(lettRil),nome);
                 System.out.println("Ricevuto: " + lettRil + " da " + ms.getNomeClient());//utenti[i - 1].nome);
