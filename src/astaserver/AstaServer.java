@@ -78,6 +78,7 @@ class Cliente extends Thread implements Observer {
     @Override
     public void run() {
         try {
+            
             nome = in.readLine();//stringa che memorizza il nome del client
             System.out.println("Si è collegato l'utente con ip " + client.getInetAddress() + " con il nome " + nome);
 
