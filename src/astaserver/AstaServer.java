@@ -6,6 +6,7 @@ package astaserver;
 import static astaserver.AstaServer.baseAsta;
 import static astaserver.AstaServer.i;
 import static astaserver.AstaServer.n_utenti;
+import static astaserver.AstaServer.tm;
 import static astaserver.AstaServer.utenti;
 import java.net.*;
 import java.io.*;
@@ -14,6 +15,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Scanner;
 import java.util.Random;
+//import finestra.Time.tm;
 
 public class AstaServer {
 
@@ -23,6 +25,7 @@ public class AstaServer {
     static int i = 0;//indice per memorizzare ip e nome client
     static int baseAsta;//variabile che indica lo stato della miglior offerta 
     static MonitorServ ms;
+    static Time tm=new Time();
 
     public static void main(String[] args) {
         Scanner ut = new Scanner(System.in);
@@ -30,7 +33,7 @@ public class AstaServer {
         n_utenti = ut.nextInt();
         utenti = new Utenti[n_utenti];//definisce la grandezza dell'array di utenti
         Random r=new Random();
-        baseAsta =r.nextInt(100);
+        baseAsta =30;//r.nextInt(100);
         ms = new MonitorServ(baseAsta);
         try {
             ServerSocket server = new ServerSocket(Numero_Porta, n_utenti);
@@ -39,6 +42,9 @@ public class AstaServer {
                 Cliente clt = new Cliente(client, ms);
                 ms.addObserver(clt);
                 clt.start();
+                //fa partire il thread solo una volta,appena si connette il primo client
+                if(ms.countObservers()==1)
+                    tm.start();;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,9 +93,6 @@ class Cliente extends Thread implements Observer {
             //lettura rilancio da parte del client e set dell'offerta corrente
             while(true)
             {
-                //in entrata c'è sempre un'offerta maggiore di quella corrente
-                //qui verrà ogni volta reinizializzata la variabile che tiene conto del tempo trascorso
-                //la procedura per il tempo dev'essere fatta tuttta qui dentro
                 String lettRil = in.readLine();
                 ms.setBaseAsta(Integer.parseInt(lettRil),nome);
                 System.out.println("Ricevuto: " + lettRil + " da " + ms.getNomeClient());//utenti[i - 1].nome);
@@ -99,10 +102,11 @@ class Cliente extends Thread implements Observer {
             e.printStackTrace();
         }
     }
-    //metodo che comunica al client l'fferta migliore corrente 
+    //metodo che comunica al client l'offerta migliore corrente 
     @Override
     public void update(Observable o, Object o1) {
         System.out.println("Aggiorno");
+        out.println(String.valueOf(ms.sendTime()));
         //uscita dell'informazione contenente il nome del client che ha effettuato l'offerta migliore
         out.println(String.valueOf(ms.getNomeClient()));
         out.println(String.valueOf(ms.getBaseAsta()));
