@@ -41,7 +41,7 @@ public class MonitorServ extends Observable {
     synchronized public void setBaseAsta(int baseAsta, String nomeCL) {
         if (getBaseAsta() < baseAsta) {
             this.baseAsta = baseAsta;
-            tm.setI();
+            //tm.setI();
             setNomeClient(nomeCL);
             setChanged();
             notifyObservers();

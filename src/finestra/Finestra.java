@@ -5,36 +5,34 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.Random;
 import java.net.*;
-import java.io.*;
 
-public class Finestra implements ActionListener {
+public class Finestra {
 
-    final static int NUMERO_PORTA = 3333;//porta alla quale il client si connetterà al server 
-    static Socket serv;
+    final int NUMERO_PORTA = 3333;//porta alla quale il client si connetterà al server 
+    Socket serv;
 
-    static JTextField sld;//textefield con il saldo disponibile 
-    static JPanel p = new JPanel();
-    static JButton AqIp = new JButton("join");
-    static String ipHint = "inserisci ip ";
-    static String rilHint = "rilancia";
-    static JTextField ip1 = new JTextField(ipHint);
-    static String IP;
-    static JButton AqSaldo = new JButton("rilancia");
-    static JButton disc = new JButton("Exit");
-    static JTextField ril = new JTextField(rilHint);
-    static JTextField ags;//TextField per l'offerta corrente
-    static JTextField sag;//TextField per chi ha effettuato l'offerta corrente
-    static int ra;
-    static String nome;//nome inserito dall'utente
-    static ClientAsta cA;//Thread che gestisce gli in ed out del client 
+    JTextField sld;//textefield con il saldo disponibile 
+    JPanel p = new JPanel();
+    JButton AqIp = new JButton("join");
+    String ipHint = "inserisci ip ";
+    String rilHint = "rilancia";
+    JTextField ip1 = new JTextField(ipHint);
+    String IP;
+    JButton AqSaldo = new JButton("rilancia");
+    JButton disc = new JButton("Exit");
+    JTextField ril = new JTextField(rilHint);
+    JTextField ags;//TextField per l'offerta corrente
+    JTextField sag;//TextField per chi ha effettuato l'offerta corrente
+    int ra;
+    String nome;//nome inserito dall'utente
+    ClientAsta cA;//Thread che gestisce gli in ed out del client 
     JLabel tempo;
-    static boolean ext;
-
-    public static void main(String[] args) {
-        ext=false;
-        
-        nome = JOptionPane.showInputDialog("Inserisci il tuo nickname");
-        JFrame f = new JFrame("ASTA");                            //finestra
+    boolean ext;
+    JFrame f;
+    public Finestra(String nome) {
+        this.nome = nome;
+        ext = false;
+        f = new JFrame("ASTA");
         f.setSize(400, 400);
         f.setLocation(500, 100);
         f.setVisible(true);
@@ -47,6 +45,11 @@ public class Finestra implements ActionListener {
         p.setVisible(true);
         p.setBackground(Color.GRAY);
         f.add(p);
+        tempo = new JLabel("");
+        tempo.setSize(20, 20);
+        tempo.setLocation(350, 100);
+        tempo.setVisible(true);
+        p.add(tempo);
         //FocusListener che cancella/rimette il testo del textfield del ip appena l'utente schiccia su quest'ultimo 
         FocusListener ipvisibile = new FocusListener() {
             @Override
@@ -85,7 +88,8 @@ public class Finestra implements ActionListener {
             }
 
         };
-
+        Listener l=new Listener(this);
+        
         ip1.setSize(100, 30);                                    //casella per l' ip
         ip1.setLocation(30, 30);
         ip1.addFocusListener(ipvisibile);
@@ -100,14 +104,14 @@ public class Finestra implements ActionListener {
 
         AqSaldo.setSize(100, 30);                                //bottone per rilanciare
         AqSaldo.setLocation(150, 300);
-        AqSaldo.addActionListener(new Finestra());
+        AqSaldo.addActionListener(l);
         AqSaldo.setVisible(true);
         AqSaldo.setBackground(Color.LIGHT_GRAY);
         p.add(AqSaldo);
 
         disc.setSize(100, 30);                                   //bottone per disconnettersi (exit)
         disc.setLocation(250, 300);
-        disc.addActionListener(new Finestra());
+        disc.addActionListener(l);
         disc.setVisible(true);
         disc.setBackground(Color.LIGHT_GRAY);
         p.add(disc);
@@ -116,7 +120,7 @@ public class Finestra implements ActionListener {
         AqIp.setLocation(150, 30);
         AqIp.setVisible(true);
         AqIp.setBackground(Color.red);
-        AqIp.addActionListener(new Finestra());
+        AqIp.addActionListener(l);
         p.add(AqIp);
 
         Random random = new Random();
@@ -172,79 +176,159 @@ public class Finestra implements ActionListener {
         sag.setVisible(true);
         sag.setEditable(false);
         p.add(sag);
-        //label per il tempo
-        tempo=new JLabel();
-        tempo.setSize(20,20);
-        tempo.setLocation(350,100);
-        tempo.setVisible(true);
-        p.add(tempo);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String s = e.getActionCommand();
-        //bottone per joinare all'asta 
-        if (s.equalsIgnoreCase("join")) {
-            if (ext == false) {
-                AqIp.setBackground(Color.green);
-                IP = getText(ip1);
-                //procedura per la connessione
-                try {
-                    ip1.setEditable(false);
-                    AqIp.removeActionListener(this);
-                    serv = new Socket(IP, NUMERO_PORTA);
-                    cA = new ClientAsta(serv);
-                    cA.start();
-                } catch (NoRouteToHostException ex) {
-                    JOptionPane.showMessageDialog(p, "L'ip inserito non è valido");
-                    ip1.setEditable(true);
-                    AqIp.addActionListener(this);
-                    AqIp.setBackground(Color.RED);
-                } catch (IOException ex) {
-                    //Logger.getLogger(Finestra.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(p, "L'ip inserito non è valido");
-                    ip1.setEditable(true);
-                    AqIp.addActionListener(this);
-                    AqIp.setBackground(Color.RED);
-                }
-            }
 
-        }
-        //bottone per far uscire l'utente (nasconde i bottoni così che l'utente non possa più agire su di essi) 
-        if (s.equalsIgnoreCase("exit")) {
-            ext = true;
-            AqSaldo.setVisible(false);
-            ril.setVisible(false);
-            disc.setVisible(false);
-            ip1.setEditable(false);
-            AqIp.removeActionListener(this);
-        } else {
-            //bottone per rilanciare 
-            if (s.equalsIgnoreCase("rilancia") && ext == false) {
-                if (Integer.parseInt(ags.getText()) >= Integer.parseInt(ril.getText())) {
-                    JOptionPane.showMessageDialog(p, "L'offera inserita risulta minore o uguale all'offerta corrente");
-                } else {
-                    //controllo per vedere se l'offerta corrente è inferiore al saldo disponibile
-                    if (ra >= Integer.parseInt(ril.getText())) {
-                        ra = ra - Integer.parseInt(ril.getText());
-                        sld.setText(String.valueOf(ra));
-                        cA.sendAsta(Integer.parseInt(ril.getText()));
-                    } else {
-                        JOptionPane.showMessageDialog(p, "L'offerta che hai cercato di effettuare supera il tuo saldo disponibile");
-                    }
-                }
-
-            }
-        }
+    public Socket getServ() {
+        return serv;
     }
 
-    private String getText(JTextField ip1) {
-        IP = ip1.getText();
+    public void setServ(Socket serv) {
+        this.serv = serv;
+    }
+
+    public JTextField getSld() {
+        return sld;
+    }
+
+    public void setSld(JTextField sld) {
+        this.sld = sld;
+    }
+
+    public JPanel getP() {
+        return p;
+    }
+
+    public void setP(JPanel p) {
+        this.p = p;
+    }
+
+    public JButton getAqIp() {
+        return AqIp;
+    }
+
+    public void setAqIp(JButton AqIp) {
+        this.AqIp = AqIp;
+    }
+
+    public String getIpHint() {
+        return ipHint;
+    }
+
+    public void setIpHint(String ipHint) {
+        this.ipHint = ipHint;
+    }
+
+    public String getRilHint() {
+        return rilHint;
+    }
+
+    public void setRilHint(String rilHint) {
+        this.rilHint = rilHint;
+    }
+
+    public JTextField getIp1() {
+        return ip1;
+    }
+
+    public void setIp1(JTextField ip1) {
+        this.ip1 = ip1;
+    }
+
+    public String getIP() {
         return IP;
+    }
+
+    public void setIP(String IP) {
+        this.IP = IP;
+    }
+
+    public JButton getAqSaldo() {
+        return AqSaldo;
+    }
+
+    public void setAqSaldo(JButton AqSaldo) {
+        this.AqSaldo = AqSaldo;
+    }
+
+    public JButton getDisc() {
+        return disc;
+    }
+
+    public void setDisc(JButton disc) {
+        this.disc = disc;
+    }
+
+    public JTextField getRil() {
+        return ril;
+    } 
+
+    public void setRil(JTextField ril) {
+        this.ril = ril;
+    }
+
+    public JTextField getAgs() {
+        return ags;
+    }
+
+    public void setAgs(JTextField ags) {
+        this.ags = ags;
+    }
+
+    public JTextField getSag() {
+        return sag;
+    }
+
+    public void setSag(JTextField sag) {
+        this.sag = sag;
+    }
+
+    public int getRa() {
+        return ra;
+    }
+
+    public void setRa(int ra) {
+        this.ra = ra;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public ClientAsta getcA() {
+        return cA;
+    }
+
+    public void setcA(ClientAsta cA) {
+        this.cA = cA;
     }
 
     public JLabel getTempo() {
         return tempo;
     }
 
+    public void setTempo(JLabel tempo) {
+        this.tempo = tempo;
+    }
+
+    public boolean isExt() {
+        return ext;
+    }
+
+    public void setExt(boolean ext) {
+        this.ext = ext;
+    }
+    
+    
+
+    public static void main(String[] args) {
+        String nome = JOptionPane.showInputDialog("Inserisci il tuo nickname");
+        Finestra finestra = new Finestra(nome);
+    }
+
 }
+
