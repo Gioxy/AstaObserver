@@ -5,6 +5,7 @@
  */
 package astaserver;
 
+import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,35 +13,36 @@ import java.util.logging.Logger;
  *
  * @author gioxy
  */
-public class Time extends Thread {
-
+public class Timer extends Observable implements Runnable{
+    
     private int i;
 
-    public Time() {
-        this.i = 0;
+    public Timer() {
+        this.i = 20;
     }
-    
 
     public int getI() {
         return i;
     }
 
-    public void setI() {
-        i = 0;
+    public int setI() {
+        i=20;
+        return i;
     }
-
+    
+    
+    
     @Override
     public void run() {
         while (true) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Time.class.getName()).log(Level.SEVERE, null, ex);
             }
-            i++;
+            i--;
+        setChanged();
+        notifyObservers();
         }
     }
-
+    
 }
-
-

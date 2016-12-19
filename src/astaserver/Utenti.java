@@ -1,6 +1,4 @@
-
 package astaserver;
-
 /**
  *
  * @author Gioele Salmaso
@@ -19,9 +17,5 @@ public class Utenti
     @Override
     public String toString() {
         return "Utenti{" + "nome=" + nome + ", indiIp=" + indiIp + '}';
-    }
-    
-    
-    
-    
+    } 
 }

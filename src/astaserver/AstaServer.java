@@ -1,7 +1,7 @@
 package astaserver;
 
 /**
- * @author gioele.salmaso,matteo.scalone
+ * @author Gioele Salmaso
  */
 import java.net.*;
 import java.io.*;
@@ -12,7 +12,6 @@ import java.util.Scanner;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import finestra.Time.tm;
 
 public class AstaServer {
 
@@ -23,13 +22,16 @@ public class AstaServer {
     int baseAsta;//variabile che indica lo stato della miglior offerta 
     MonitorServ ms;
     ServerSocket server;
-    Time tm=new Time();
+    Timer tm;
+    //static Time tm;//timer
 
-    public AstaServer(Utenti[] utenti, int n_utenti, int baseAsta, MonitorServ ms) {
+    public AstaServer(Utenti[] utenti, int n_utenti, int baseAsta, MonitorServ ms, Timer tm) {
         this.utenti = utenti;
         this.n_utenti = n_utenti;
         this.baseAsta = baseAsta;
         this.ms = ms;
+        this.tm = tm;
+        //tm=new Time();
         try {
             server = new ServerSocket(Numero_Porta, n_utenti);
         } catch (IOException ex) {
@@ -37,22 +39,27 @@ public class AstaServer {
         }
     }
 
-    public void accettazione(){
+    public void accettazione() {
         try {
             while (true) {
                 Socket client = server.accept();
-                Cliente clt = new Cliente(client, ms,this);
+                Cliente clt = new Cliente(client, ms, this);
                 ms.addObserver(clt);
+                tm.addObserver(clt);
                 clt.start();
                 //fa partire il thread solo una volta,appena si connette il primo client
-                if(ms.countObservers()==1)
-                    tm.start();
+                if (ms.countObservers() == 1) {
+                    Thread tempo = new Thread(tm);
+                    tempo.start();
+                }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    //inizio metodi getter and setter 
     public Utenti[] getUtenti() {
         return utenti;
     }
@@ -60,8 +67,8 @@ public class AstaServer {
     public void setUtenti(Utenti[] utenti) {
         this.utenti = utenti;
     }
-    
-    public void setUtenti(int i, Utenti utente){
+
+    public void setUtenti(int i, Utenti utente) {
         getUtenti()[i] = utente;
     }
 
@@ -105,23 +112,24 @@ public class AstaServer {
         this.server = server;
     }
 
-    public Time getTm() {
+    public Timer getTm() {
         return tm;
     }
 
-    public void setTm(Time tm) {
+    public void setTm(Timer tm) {
         this.tm = tm;
     }
-    
+
     public static void main(String[] args) {
         Scanner ut = new Scanner(System.in);
         System.out.println("Quanti utenti possono partecipare all'asta?");
         int n_utenti = ut.nextInt();
-        Utenti [] utenti = new Utenti[n_utenti];//definisce la grandezza dell'array di utenti
-        Random r=new Random();
-        int baseAsta =30;//r.nextInt(100);
+        Utenti[] utenti = new Utenti[n_utenti];//definisce la grandezza dell'array di utenti
+        Random r = new Random();
+        int baseAsta = r.nextInt(100);
         MonitorServ ms = new MonitorServ(baseAsta);
-        AstaServer server = new AstaServer(utenti,n_utenti,baseAsta,ms);
+        Timer tm = new Timer();
+        AstaServer server = new AstaServer(utenti, n_utenti, baseAsta, ms, tm);
         server.accettazione();
     }
 
@@ -133,18 +141,20 @@ class Cliente extends Thread implements Observer {
     BufferedReader in;
     PrintWriter out;
     MonitorServ ms;
-    String nome ;
+    String nome;
     AstaServer as;
+    //Timer tm;
 
-    public Cliente(Socket client, MonitorServ ms,AstaServer as) {
+    public Cliente(Socket client, MonitorServ ms, AstaServer as) {
         this.client = client;
-        this.as=as;
+        this.as = as;
         this.ms = ms;
-        nome="";
-        try{
-        in = new BufferedReader(new InputStreamReader(client.getInputStream()));//
-        out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
-        }catch(IOException e){
+        //Thread tempo=new Thread(tm);
+        nome = "";
+        try {
+            in = new BufferedReader(new InputStreamReader(client.getInputStream()));//
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -153,37 +163,56 @@ class Cliente extends Thread implements Observer {
     @Override
     public void run() {
         try {
-            
+
             nome = in.readLine();//stringa che memorizza il nome del client
             System.out.println("Si è collegato l'utente con ip " + client.getInetAddress() + " con il nome " + nome);
 
-            //memorizzazione ip e nome del client all'interno del array di utenti
+            /**
+             * memorizzazione ip e nome del client all'interno del array di
+             * utenti
+             */
             as.setUtenti(as.getI(), new Utenti(nome, client.getInetAddress().toString()));
-            if(as.getI()<as.getN_utenti())
-                as.setI(as.getI()+1);
+            if (as.getI() < as.getN_utenti()) {
+                as.setI(as.getI() + 1);
+            }
             System.out.println(Arrays.deepToString(as.getUtenti()));
-            //comunicazione base d'asta iniziale ai client
+            /**
+             * comunicazione base d'asta iniziale ai client
+             */
+
             out.println(ms.getNomeClient());
             out.println(ms.getBaseAsta());
+            /**
+             * lettura rilancio da parte del client e set dell'offerta corrente
+             */
+            while (true) {
+                try {
+                    String lettRil = in.readLine();
+                    ms.setBaseAsta(Integer.parseInt(lettRil), nome);
+                    System.out.println("Ricevuto: " + lettRil + " da " + ms.getNomeClient());
+                    System.out.println("Current asta: " + ms.getBaseAsta());
+                    //reset del tempo quando si riceve un'offerta
+                    as.getTm().setI();
+                } catch (NumberFormatException e) {
+                } catch (SocketException ex) {
 
-            //lettura rilancio da parte del client e set dell'offerta corrente
-            while(true)
-            {
-                String lettRil = in.readLine();
-                ms.setBaseAsta(Integer.parseInt(lettRil),nome);
-                System.out.println("Ricevuto: " + lettRil + " da " + ms.getNomeClient());//utenti[i - 1].nome);
-                System.out.println("Current asta: " + ms.getBaseAsta());
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    //metodo che comunica al client l'offerta migliore corrente 
+
+    /**
+     * metodo che comunica al client l'offerta migliore corrente
+     *
+     * @param o
+     * @param o1
+     */
     @Override
-    public void update(Observable o, Object o1) {
-        System.out.println("Aggiorno");
-        //out.println(String.valueOf(ms.sendTime()));
+    public void update(Observable Timer, Object o1) {
         //uscita dell'informazione contenente il nome del client che ha effettuato l'offerta migliore
+        out.println(String.valueOf(as.getTm().getI()) + " s");
         out.println(String.valueOf(ms.getNomeClient()));
         out.println(String.valueOf(ms.getBaseAsta()));
     }

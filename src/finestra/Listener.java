@@ -1,30 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package finestra;
-
+/**
+ * 
+ * @author Gioele Salmaso
+ */
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author gioxy
- */
 public class Listener implements ActionListener{
     Finestra finestra;
     public Listener(Finestra finestra){
         this.finestra = finestra;
     }
-    
     
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -34,7 +25,8 @@ public class Listener implements ActionListener{
             if (finestra.isExt() == false) {
                 finestra.getAqIp().setBackground(Color.green);
                 finestra.setIP(finestra.getIp1().getText());
-                //procedura per la connessione
+                /**procedura per la connessione
+                 */
                 try {
                     finestra.getIp1().setEditable(false);
                     finestra.getAqIp().removeActionListener(this);
@@ -47,7 +39,6 @@ public class Listener implements ActionListener{
                     finestra.getAqIp().addActionListener(this);
                     finestra.getAqIp().setBackground(Color.RED);
                 } catch (IOException ex) {
-                    //Logger.getLogger(Finestra.class.getName()).log(Level.SEVERE, null, ex);
                     JOptionPane.showMessageDialog(finestra.getP(), "L'ip inserito non è valido");
                     finestra.getIp1().setEditable(true);
                     finestra.getAqIp().addActionListener(this);
@@ -57,7 +48,7 @@ public class Listener implements ActionListener{
 
         }
         //bottone per far uscire l'utente (nasconde i bottoni così che l'utente non possa più agire su di essi) 
-        if (s.equalsIgnoreCase("exit")) {
+        if (s.equalsIgnoreCase("nascondi")) {
             finestra.setExt(true);
             finestra.getAqSaldo().setVisible(false);
             finestra.getRil().setVisible(false);
@@ -71,8 +62,8 @@ public class Listener implements ActionListener{
                 if (Integer.parseInt(finestra.getAgs().getText()) >= Integer.parseInt(finestra.getRil().getText())) {
                     JOptionPane.showMessageDialog(finestra.getP(), "L'offera inserita risulta minore o uguale all'offerta corrente");
                 } else {
-                    //controllo per vedere se l'offerta corrente è inferiore al saldo disponibile
-                    System.out.println("Devo rilanciare");
+                    /**controllo per vedere se l'offerta corrente è inferiore al saldo disponibile
+                     */
                     if (finestra.getRa() >= Integer.parseInt(finestra.getRil().getText())) {
                         finestra.setRa(finestra.getRa() - Integer.parseInt(finestra.getRil().getText()));
                         finestra.getSld().setText(String.valueOf(finestra.getRa()));

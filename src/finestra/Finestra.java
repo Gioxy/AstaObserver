@@ -1,4 +1,8 @@
 package finestra;
+/**
+ * 
+ * @author Gioele Salmaso
+ */
 
 import java.awt.*;
 import javax.swing.*;
@@ -18,15 +22,16 @@ public class Finestra {
     String rilHint = "rilancia";
     JTextField ip1 = new JTextField(ipHint);
     String IP;
-    JButton AqSaldo = new JButton("rilancia");
-    JButton disc = new JButton("Exit");
+    JButton AqSaldo = new JButton("rilancia");//bottone per rilanciare 
+    JButton disc = new JButton("Nascondi");
     JTextField ril = new JTextField(rilHint);
     JTextField ags;//TextField per l'offerta corrente
     JTextField sag;//TextField per chi ha effettuato l'offerta corrente
-    int ra;
+    int ra;//random per il saldo 
     String nome;//nome inserito dall'utente
     ClientAsta cA;//Thread che gestisce gli in ed out del client 
-    JLabel tempo;
+    JLabel tempo;//label per visualizzare il tempo 
+    JLabel tx;
     boolean ext;
     JFrame f;
     public Finestra(String nome) {
@@ -45,10 +50,19 @@ public class Finestra {
         p.setVisible(true);
         p.setBackground(Color.GRAY);
         f.add(p);
+        
+        tx=new JLabel("Scade fra:");
+        tx.setSize(100, 100);
+        tx.setLocation(20, 85);
+        tx.setVisible(true);
+        p.add(tx);
+        
         tempo = new JLabel("");
-        tempo.setSize(20, 20);
-        tempo.setLocation(350, 100);
+        tempo.setSize(40,30);
+        tempo.setLocation(40, 140);
         tempo.setVisible(true);
+        tempo.setForeground(Color.GREEN);
+        tempo.setFont(new Font("Serif",Font.PLAIN,15));
         p.add(tempo);
         //FocusListener che cancella/rimette il testo del textfield del ip appena l'utente schiccia su quest'ultimo 
         FocusListener ipvisibile = new FocusListener() {
@@ -179,6 +193,7 @@ public class Finestra {
     }
 
 
+    //inizio metodi getter and setter per i vari campi 
     public Socket getServ() {
         return serv;
     }
