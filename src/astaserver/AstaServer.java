@@ -10,8 +10,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Scanner;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class AstaServer {
 
@@ -23,7 +21,6 @@ public class AstaServer {
     MonitorServ ms;
     ServerSocket server;
     Timer tm;
-    //static Time tm;//timer
 
     public AstaServer(Utenti[] utenti, int n_utenti, int baseAsta, MonitorServ ms, Timer tm) {
         this.utenti = utenti;
@@ -31,11 +28,9 @@ public class AstaServer {
         this.baseAsta = baseAsta;
         this.ms = ms;
         this.tm = tm;
-        //tm=new Time();
         try {
             server = new ServerSocket(Numero_Porta, n_utenti);
         } catch (IOException ex) {
-            Logger.getLogger(AstaServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -44,8 +39,8 @@ public class AstaServer {
             while (true) {
                 Socket client = server.accept();
                 Cliente clt = new Cliente(client, ms, this);
-                ms.addObserver(clt);
-                tm.addObserver(clt);
+                ms.addObserver(clt);//aggiunta observer che monitora l'asta
+                tm.addObserver(clt);//aggiunta observer che monitora il tempo
                 clt.start();
                 //fa partire il thread solo una volta,appena si connette il primo client
                 if (ms.countObservers() == 1) {
@@ -206,7 +201,7 @@ class Cliente extends Thread implements Observer {
     /**
      * metodo che comunica al client l'offerta migliore corrente
      *
-     * @param o
+     * @param Timer
      * @param o1
      */
     @Override

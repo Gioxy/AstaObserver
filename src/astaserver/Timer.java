@@ -1,22 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package astaserver;
 
 import java.util.Observable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
- * @author gioxy
+ * @author Gioele Salmaso
  */
 public class Timer extends Observable implements Runnable{
     
     private int i;
 
+    //inizializza il tempo a 20 secondi 
     public Timer() {
         this.i = 20;
     }
@@ -25,11 +19,11 @@ public class Timer extends Observable implements Runnable{
         return i;
     }
 
+    //reimposta il tempo nel caso in cui si riceva un'offerta maggiore di quella corrente
     public int setI() {
         i=20;
         return i;
     }
-    
     
     
     @Override

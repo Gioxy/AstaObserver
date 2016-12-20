@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 
@@ -64,7 +62,7 @@ public class ClientAsta extends Thread {
                         finestra.getDisc().setVisible(false);
                         finestra.getIp1().setEditable(false);
                     } else {
-                        JOptionPane.showMessageDialog(finestra.getP(), "HA VINTO L'ASTA L'UTENTE: " + finestra.getSag().getText() + " ,CON L'OFFERTA DI: " + finestra.getAgs().getText());
+                        JOptionPane.showMessageDialog(finestra.getP(), "HA VINTO L'ASTA L'UTENTE: " + finestra.getSag().getText() + " ,CON L'OFFERTA DI: " + finestra.getAgs().getText()+" €");
                         in.close();
                         c.close();
                         out.close();

@@ -47,7 +47,7 @@ public class Listener implements ActionListener{
             }
 
         }
-        //bottone per far uscire l'utente (nasconde i bottoni così che l'utente non possa più agire su di essi) 
+        //bottone per far entrare lo spettatore in modalità "spettatore" (nasconde i bottoni così che l'utente non possa più agire su di essi) 
         if (s.equalsIgnoreCase("nascondi")) {
             finestra.setExt(true);
             finestra.getAqSaldo().setVisible(false);
